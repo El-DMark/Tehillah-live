@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -243,42 +244,92 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            padding: 10px;
+            padding: 12px 15px;
             border-radius: 15px;
             cursor: pointer;
-            transition: background 0.2s;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            margin-bottom: 8px;
         }
 
         .song-item:hover {
-            background: var(--surface-hover);
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
         .song-item.active {
             background: rgba(155, 81, 224, 0.15);
-            border: 1px solid rgba(155, 81, 224, 0.3);
+            border: 1px solid rgba(155, 81, 224, 0.4);
+            box-shadow: 0 5px 20px rgba(155, 81, 224, 0.2);
         }
 
         .song-item img {
-            width: 45px;
-            height: 45px;
-            border-radius: 10px;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
             object-fit: cover;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
         .song-item-info {
             display: flex;
             flex-direction: column;
+            flex-grow: 1;
         }
 
         .song-item-title {
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 600;
         }
 
         .song-item-artist {
             font-size: 13px;
             color: var(--text-muted);
+            margin-top: 2px;
         }
+
+        /* Animated Equalizer for Active Song */
+        .equalizer {
+            display: none;
+            align-items: flex-end;
+            gap: 3px;
+            height: 18px;
+            margin-left: auto;
+        }
+
+        .song-item.active .equalizer {
+            display: flex;
+        }
+
+        .equalizer .bar {
+            width: 4px;
+            background-color: #70E1F5;
+            border-radius: 2px;
+            animation: bounce 1s infinite ease-in-out;
+            transform-origin: bottom;
+        }
+
+        .equalizer .bar:nth-child(1) { height: 12px; animation-delay: 0.1s; }
+        .equalizer .bar:nth-child(2) { height: 18px; animation-delay: 0.2s; }
+        .equalizer .bar:nth-child(3) { height: 10px; animation-delay: 0.3s; }
+        .equalizer .bar:nth-child(4) { height: 15px; animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 100% { transform: scaleY(0.4); }
+            50% { transform: scaleY(1); }
+        }
+
+        /* Visitor Badge */
+        .listeners-badge {
+            margin-top: 5px;
+            display: flex;
+            justify-content: center;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+        .listeners-badge:hover { opacity: 1; }
 
         /* Audio Element (Hidden) */
         audio {
@@ -305,6 +356,10 @@
     <div class="container">
         <header>
             <h1>Tehillah</h1>
+            <div class="listeners-badge">
+                <!-- Using VisitorBadge API for free total page visit tracking -->
+                <img src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Ftehillah.live&label=Total%20Listeners&countColor=%239b51e0&style=flat-square" alt="Total Listeners">
+            </div>
         </header>
 
         <div class="now-playing">
@@ -385,7 +440,7 @@
                 }
 
                 renderSongList();
-                loadSong(targetIndex, false);
+                loadSong(targetIndex, true);
                 
             } catch (error) {
                 console.error("Error loading songs:", error);
@@ -405,6 +460,9 @@
                     <div class="song-item-info">
                         <div class="song-item-title">${song.title}</div>
                         <div class="song-item-artist">${song.artist}</div>
+                    </div>
+                    <div class="equalizer">
+                        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
                     </div>
                 `;
                 li.onclick = () => {
@@ -454,9 +512,14 @@
         }
 
         function playSong() {
-            isPlaying = true;
-            playIcon.className = 'ri-pause-fill';
-            audio.play().catch(e => console.log("Autoplay blocked by browser until user interacts"));
+            audio.play().then(() => {
+                isPlaying = true;
+                playIcon.className = 'ri-pause-fill';
+            }).catch(e => {
+                console.log("Autoplay blocked by browser until user interacts");
+                isPlaying = false;
+                playIcon.className = 'ri-play-fill';
+            });
         }
 
         function pauseSong() {
