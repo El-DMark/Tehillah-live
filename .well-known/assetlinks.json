@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.paam.songbook",
+    "sha256_cert_fingerprints": [
+      "5B:C9:71:38:E0:7F:6E:8A:79:FE:D8:BF:FE:49:63:90:97:49:A0:23:ED:46:F4:69:CB:A3:49:FA:A1:D9:B1:3B"
+    ]
+  }
+}]
