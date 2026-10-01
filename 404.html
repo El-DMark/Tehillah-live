@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tehillah Web Player</title>
+    
+    <!-- Open Graph Meta Tags for WhatsApp/Instagram Previews -->
+    <meta property="og:title" content="Tehillah - Worship & Praise" />
+    <meta property="og:description" content="Listen to beautiful worship songs on Tehillah." />
+    <meta property="og:type" content="music.song" />
+    <meta property="og:image" content="https://raw.githubusercontent.com/El-DMark/songbook/main/favsCoverart/favsCoverart.png" />
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #9b51e0;
+            --primary-glow: rgba(155, 81, 224, 0.5);
+            --bg-color: #0f0c20;
+            --surface: rgba(255, 255, 255, 0.05);
+            --surface-hover: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-muted: #a09ebd;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-image: 
+                linear-gradient(rgba(15, 12, 32, 0.4), rgba(15, 12, 32, 0.8)),
+                url('https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&w=1920&q=80'); /* Placeholder Landscape Image */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        /* Glassmorphism Container */
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            width: 90%;
+            background: rgba(20, 18, 38, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        header {
+            text-align: center;
+        }
+
+        header h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #70E1F5, #FFD194, #70E1F5);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientSweep 3s linear infinite;
+        }
+
+        @keyframes gradientSweep {
+            to { background-position: 200% center; }
+        }
+
+        /* Now Playing Section */
+        .now-playing {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .album-art {
+            width: 220px;
+            height: 220px;
+            border-radius: 20px;
+            object-fit: cover;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease;
+        }
+
+        .album-art:hover {
+            transform: scale(1.02);
+        }
+
+        .song-info {
+            text-align: center;
+        }
+
+        .song-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .song-artist {
+            font-size: 16px;
+            color: var(--text-muted);
+        }
+
+        /* Custom Audio Controls */
+        .controls {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .progress-container {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .progress-bar {
+            flex-grow: 1;
+            -webkit-appearance: none;
+            height: 6px;
+            background: var(--surface);
+            border-radius: 10px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .progress-bar::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .progress-bar::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .btn {
+            background: none;
+            border: none;
+            color: var(--text-main);
+            font-size: 28px;
+            cursor: pointer;
+            transition: color 0.2s, transform 0.2s;
+        }
+
+        .btn:hover {
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .btn-play {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            font-size: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 20px var(--primary-glow);
+        }
+
+        .btn-play:hover {
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px var(--primary-glow);
+        }
+
+        /* Song List */
+        .song-list-container {
+            margin-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 20px;
+        }
+        
+        .song-list-container h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: var(--text-muted);
+        }
+
+        .song-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        /* Custom Scrollbar */
+        .song-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .song-list::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+        .song-list::-webkit-scrollbar-thumb {
+            background: var(--surface-hover);
+            border-radius: 10px;
+        }
+
+        .song-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .song-item:hover {
+            background: var(--surface-hover);
+        }
+
+        .song-item.active {
+            background: rgba(155, 81, 224, 0.15);
+            border: 1px solid rgba(155, 81, 224, 0.3);
+        }
+
+        .song-item img {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .song-item-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .song-item-title {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .song-item-artist {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Audio Element (Hidden) */
+        audio {
+            display: none;
+        }
+
+        /* App Promo */
+        .app-promo {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .app-promo a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Tehillah</h1>
+        </header>
+
+        <div class="now-playing">
+            <img id="np-art" class="album-art" src="https://via.placeholder.com/220" alt="Album Art">
+            <div class="song-info">
+                <div id="np-title" class="song-title">Loading...</div>
+                <div id="np-artist" class="song-artist">Please wait</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="progress-container">
+                <span id="time-current">0:00</span>
+                <input type="range" id="progress-bar" class="progress-bar" value="0" min="0" max="100">
+                <span id="time-total">0:00</span>
+            </div>
+            
+            <div class="buttons">
+                <button class="btn" id="btn-prev"><i class="ri-skip-back-fill"></i></button>
+                <button class="btn btn-play" id="btn-play"><i class="ri-play-fill" id="play-icon"></i></button>
+                <button class="btn" id="btn-next"><i class="ri-skip-forward-fill"></i></button>
+            </div>
+        </div>
+
+        <div class="song-list-container">
+            <h3>More Songs</h3>
+            <ul class="song-list" id="song-list">
+                <!-- Songs injected here -->
+            </ul>
+        </div>
+    </div>
+
+    <div class="app-promo">
+        Get the full experience. <a href="#">Download Tehillah App</a>
+    </div>
+
+    <audio id="audio-player"></audio>
+
+    <script>
+        const JSON_URL = 'https://el-dmark.github.io/songbook/stream_dev.json';
+        
+        let songs = [];
+        let currentIndex = 0;
+        let isPlaying = false;
+
+        const audio = document.getElementById('audio-player');
+        const playBtn = document.getElementById('btn-play');
+        const playIcon = document.getElementById('play-icon');
+        const prevBtn = document.getElementById('btn-prev');
+        const nextBtn = document.getElementById('btn-next');
+        const progressBar = document.getElementById('progress-bar');
+        const timeCurrent = document.getElementById('time-current');
+        const timeTotal = document.getElementById('time-total');
+        
+        const npTitle = document.getElementById('np-title');
+        const npArtist = document.getElementById('np-artist');
+        const npArt = document.getElementById('np-art');
+        const songListEl = document.getElementById('song-list');
+
+        async function init() {
+            try {
+                const response = await fetch(JSON_URL);
+                songs = await response.json();
+                
+                if(songs.length === 0) return;
+
+                // 1. Check URL for Deep Link ID
+                // E.g., https://tehillah.live/song/123
+                const pathParts = window.location.pathname.split('/');
+                const deepLinkId = pathParts[pathParts.length - 1]; // "123"
+                
+                let targetIndex = 0;
+                if (deepLinkId && !isNaN(deepLinkId)) {
+                    const foundIndex = songs.findIndex(s => s.songID == deepLinkId);
+                    if (foundIndex !== -1) {
+                        targetIndex = foundIndex;
+                    }
+                }
+
+                renderSongList();
+                loadSong(targetIndex, false);
+                
+            } catch (error) {
+                console.error("Error loading songs:", error);
+                npTitle.innerText = "Error loading songs";
+                npArtist.innerText = "";
+            }
+        }
+
+        function renderSongList() {
+            songListEl.innerHTML = '';
+            songs.forEach((song, index) => {
+                const li = document.createElement('li');
+                li.className = 'song-item';
+                li.id = `song-item-${index}`;
+                li.innerHTML = `
+                    <img src="${song.albumArt}" alt="${song.title}">
+                    <div class="song-item-info">
+                        <div class="song-item-title">${song.title}</div>
+                        <div class="song-item-artist">${song.artist}</div>
+                    </div>
+                `;
+                li.onclick = () => {
+                    loadSong(index, true);
+                };
+                songListEl.appendChild(li);
+            });
+        }
+
+        function loadSong(index, autoPlay) {
+            // Remove active class from old
+            const oldActive = document.getElementById(`song-item-${currentIndex}`);
+            if (oldActive) oldActive.classList.remove('active');
+
+            currentIndex = index;
+            const song = songs[currentIndex];
+
+            // Add active class to new
+            const newActive = document.getElementById(`song-item-${currentIndex}`);
+            if (newActive) {
+                newActive.classList.add('active');
+                newActive.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+
+            // Update UI
+            npTitle.innerText = song.title;
+            npArtist.innerText = song.artist;
+            npArt.src = song.albumArt;
+
+            // Load Audio
+            audio.src = song.url;
+            
+            // Update URL quietly so if they share the page, it shares the current song
+            try {
+                if (window.location.protocol !== 'file:') {
+                    window.history.replaceState(null, null, `/song/${song.songID}`);
+                }
+            } catch (e) {
+                console.warn("Could not update URL (expected if running locally).");
+            }
+
+            if (autoPlay) {
+                playSong();
+            } else {
+                pauseSong();
+            }
+        }
+
+        function playSong() {
+            isPlaying = true;
+            playIcon.className = 'ri-pause-fill';
+            audio.play().catch(e => console.log("Autoplay blocked by browser until user interacts"));
+        }
+
+        function pauseSong() {
+            isPlaying = false;
+            playIcon.className = 'ri-play-fill';
+            audio.pause();
+        }
+
+        // Event Listeners
+        playBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                pauseSong();
+            } else {
+                playSong();
+            }
+        });
+
+        prevBtn.addEventListener('click', () => {
+            let newIndex = currentIndex - 1;
+            if (newIndex < 0) newIndex = songs.length - 1;
+            loadSong(newIndex, true);
+        });
+
+        nextBtn.addEventListener('click', () => {
+            let newIndex = currentIndex + 1;
+            if (newIndex >= songs.length) newIndex = 0;
+            loadSong(newIndex, true);
+        });
+
+        audio.addEventListener('ended', () => {
+            nextBtn.click();
+        });
+
+        // Audio Progress
+        audio.addEventListener('timeupdate', () => {
+            if (!isNaN(audio.duration)) {
+                const progressPercent = (audio.currentTime / audio.duration) * 100;
+                progressBar.value = progressPercent;
+                timeCurrent.innerText = formatTime(audio.currentTime);
+                timeTotal.innerText = formatTime(audio.duration);
+            }
+        });
+
+        progressBar.addEventListener('input', (e) => {
+            if (!isNaN(audio.duration)) {
+                const seekTime = (e.target.value / 100) * audio.duration;
+                audio.currentTime = seekTime;
+            }
+        });
+
+        function formatTime(seconds) {
+            const min = Math.floor(seconds / 60);
+            const sec = Math.floor(seconds % 60);
+            return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+        }
+
+        // Start
+        init();
+    </script>
+</body>
+</html>
